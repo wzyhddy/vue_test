@@ -2,9 +2,9 @@
   <div id="root">
     <div class="todo-container">
       <div class="todo-wrap">
-        <MyHeader @addTodo="addTodo"></MyHeader>
-        <MyList :todos="todos" :checkTodo="checkTodo" :deleteTodo="deleteTodo"></MyList>
-        <MyFooter :todos="todos" @checkAllTodo="checkAllTodo" @clearAllTodo="clearAllTodo"></MyFooter>
+        <MyHeader :addTodo="addTodo"></MyHeader>
+        <MyList :todos="todos"></MyList>
+        <MyFooter :todos="todos" :checkAllTodo="checkAllTodo" :clearAllTodo="clearAllTodo"></MyFooter>
       </div>
     </div>
   </div>
@@ -45,23 +45,31 @@ export default {
       })
     },
     checkAllTodo(done) {
-      this.todos.forEach(todo=>{
+      this.todos.forEach(todo => {
         todo.done = done
       })
     },
     clearAllTodo() {
-      this.todos = this.todos.filter(todo=>{
+      this.todos = this.todos.filter(todo => {
         return !todo.done;
       })
     },
   },
   watch: {
-    todos:{
+    todos: {
       deep: true,
-      handler(value){
+      handler(value) {
         localStorage.setItem('todos', JSON.stringify(value));
       }
     }
+  },
+  mounted() {
+    this.$bus.on('checkTodo', this.checkTodo)
+    this.$bus.on('deleteTodo', this.deleteTodo)
+  },
+  beforeDestroy() {
+    this.$bus.$on('checkTodo', this.checkTodo);
+    this.$bus.$on('deleteTodo', this.deleteTodo);
   }
 }
 </script>
